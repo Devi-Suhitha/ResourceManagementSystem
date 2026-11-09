@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>IT Admin - Access Requests</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- NAVBAR -->
+
+<nav class="navbar navbar-dark bg-dark">
+
+    <div class="container">
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="navbar-brand"
+        >
+            Enterprise Access Management
+        </a>
+
+        <span class="text-white">
+            IT Admin: {{ user.username }}
+        </span>
+
+    </div>
+
+</nav>
+
+
+
+<!-- MAIN CONTENT -->
+
+<div class="container mt-5">
+
+
+    <h2>
+        IT Admin - Access Requests
+    </h2>
+
+    <p class="text-muted">
+        Review access requests approved by managers.
+    </p>
+
+
+
+    {% if requests %}
+
+
+    <div class="table-responsive">
+
+
+        <table class="table table-bordered table-hover align-middle">
+
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th>Employee</th>
+
+                    <th>Resource</th>
+
+                    <th>Reason</th>
+
+                    <th>Duration</th>
+
+                    <th>Status</th>
+
+                    <th>Requested At</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+                {% for access_request in requests %}
+
+
+                <tr>
+
+
+                    <!-- EMPLOYEE -->
+
+                    <td>
+
+                        <strong>
+                            {{ access_request.user.username }}
+                        </strong>
+
+                    </td>
+
+
+
+                    <!-- RESOURCE -->
+
+                    <td>
+
+                        {{ access_request.resource.name }}
+
+                    </td>
+
+
+
+                    <!-- REASON -->
+
+                    <td>
+
+                        {{ access_request.reason }}
+
+                    </td>
+
+
+
+                    <!-- DURATION -->
+
+                    <td>
+
+                        {{ access_request.duration_days }}
+                        days
+
+                    </td>
+
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+                        {% if access_request.status == 'Manager Approved' %}
+
+                            <span class="badge bg-success">
+
+                                Manager Approved
+
+                            </span>
+
+                        {% elif access_request.status == 'IT Approved' %}
+
+                            <span class="badge bg-primary">
+
+                                IT Approved
+
+                            </span>
+
+                        {% elif access_request.status == 'IT Rejected' %}
+
+                            <span class="badge bg-danger">
+
+                                IT Rejected
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+
+                    <!-- REQUESTED TIME -->
+
+                    <td>
+
+                        {{ access_request.requested_at }}
+
+                    </td>
+
+
+
+                    <!-- ACTIONS -->
+
+                    <td>
+
+
+                        {% if access_request.status == 'Manager Approved' %}
+
+
+                        <div class="d-flex gap-2">
+
+
+                            <!-- APPROVE -->
+
+                            <a
+                                href="{% url 'it_admin_action' access_request.id 'approve' %}"
+                                class="btn btn-success btn-sm"
+                            >
+
+                                Approve
+
+                            </a>
+
+
+
+                            <!-- REJECT -->
+
+                            <a
+                                href="{% url 'it_admin_action' access_request.id 'reject' %}"
+                                class="btn btn-danger btn-sm"
+                            >
+
+                                Reject
+
+                            </a>
+
+
+                        </div>
+
+
+                        {% else %}
+
+                            <span class="text-muted">
+                                Completed
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <div class="alert alert-info">
+
+        <strong>No requests available.</strong>
+
+        <br>
+
+        There are currently no manager-approved
+        access requests waiting for IT Admin review.
+
+    </div>
+
+
+    {% endif %}
+
+
+
+    <!-- BACK TO DASHBOARD -->
+
+    <a
+        href="{% url 'it_dashboard' %}"
+        class="btn btn-secondary mt-3"
+    >
+
+        ← Back to IT Dashboard
+
+    </a>
+
+
+</div>
+
+
+</body>
+
+</html>

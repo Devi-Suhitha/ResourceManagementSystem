@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Access Requests</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        body {
+            background-color: #f5f7fa;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+        }
+
+        .request-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .resource-name {
+            font-size: 21px;
+            font-weight: 600;
+        }
+
+        .request-reason {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .request-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 18px;
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 15px;
+            margin-top: 3px;
+        }
+
+        .status-badge {
+            font-size: 13px;
+            padding: 8px 12px;
+        }
+
+        .timeline-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .timeline {
+            position: relative;
+            margin-top: 25px;
+            padding-left: 38px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background-color: #dee2e6;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 5px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -35px;
+            top: 3px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #6c757d;
+        }
+
+        .timeline-pending .timeline-dot {
+            background-color: #ffc107;
+            box-shadow: 0 0 0 2px #ffc107;
+        }
+
+        .timeline-approved .timeline-dot {
+            background-color: #198754;
+            box-shadow: 0 0 0 2px #198754;
+        }
+
+        .timeline-rejected .timeline-dot {
+            background-color: #dc3545;
+            box-shadow: 0 0 0 2px #dc3545;
+        }
+
+        .timeline-active .timeline-dot {
+            background-color: #0d6efd;
+            box-shadow: 0 0 0 2px #0d6efd;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .timeline-time {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .timeline-by {
+            color: #495057;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .active-box {
+            background-color: #e7f1ff;
+            border-left: 4px solid #0d6efd;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ================================================= -->
+<!-- NAVBAR -->
+<!-- ================================================= -->
+
+<nav class="navbar navbar-dark bg-primary">
+
+    <div class="container">
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="navbar-brand"
+        >
+            Enterprise Access Management
+        </a>
+
+        <span class="text-white">
+            {{ user.username }}
+        </span>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================================================= -->
+<!-- MAIN -->
+<!-- ================================================= -->
+
+<div class="container mt-5">
+
+    <h2>
+        My Access Requests
+    </h2>
+
+    <p class="text-muted">
+        Track the status and approval progress
+        of your access requests.
+    </p>
+
+
+    {% if requests %}
+
+
+        {% for access_request in requests %}
+
+
+        <!-- ================================================= -->
+        <!-- REQUEST CARD -->
+        <!-- ================================================= -->
+
+        <div class="request-card">
+
+
+            <!-- REQUEST HEADER -->
+
+            <div class="request-header">
+
+                <div class="row align-items-center">
+
+                    <div class="col-md-8">
+
+                        <div class="resource-name">
+
+                            {{ access_request.resource.name }}
+
+                        </div>
+
+                        <div class="request-reason">
+
+                            {{ access_request.reason }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+
+                        {% if access_request.status == 'Pending' %}
+
+                            <span class="badge bg-warning text-dark status-badge">
+                                Manager Pending
+                            </span>
+
+
+                        {% elif access_request.status == 'Manager Approved' %}
+
+                            <span class="badge bg-success status-badge">
+                                Manager Approved
+                            </span>
+
+
+                        {% elif access_request.status == 'Manager Rejected' %}
+
+                            <span class="badge bg-danger status-badge">
+                                Manager Rejected
+                            </span>
+
+
+                        {% elif access_request.status == 'IT Approved' %}
+
+                            <span class="badge bg-success status-badge">
+                                IT Approved
+                            </span>
+
+
+                        {% elif access_request.status == 'IT Rejected' %}
+
+                            <span class="badge bg-danger status-badge">
+                                IT Rejected
+                            </span>
+
+
+                        {% elif access_request.status == 'Active' %}
+
+                            <span class="badge bg-primary status-badge">
+                                Active
+                            </span>
+
+
+                        {% elif access_request.status == 'Expired' %}
+
+                            <span class="badge bg-secondary status-badge">
+                                Expired
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="badge bg-secondary status-badge">
+                                {{ access_request.status }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- REQUEST INFORMATION -->
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+
+                    <div class="info-label">
+                        Duration
+                    </div>
+
+                    <div class="info-value">
+
+                        {{ access_request.duration_days }}
+                        days
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4 mb-3">
+
+                    <div class="info-label">
+                        Requested At
+                    </div>
+
+                    <div class="info-value">
+
+                        {{ access_request.requested_at }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4 mb-3">
+
+                    <div class="info-label">
+                        Resource
+                    </div>
+
+                    <div class="info-value">
+
+                        {{ access_request.resource.name }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ACTIVE ACCESS -->
+
+            {% if access_request.status == 'Active' %}
+
+                <div class="active-box mt-3 mb-4">
+
+                    <strong>
+                        Access is currently active.
+                    </strong>
+
+                    <br><br>
+
+                    <strong>
+                        Access Start:
+                    </strong>
+
+                    {{ access_request.access_start_date }}
+
+                    <br>
+
+                    <strong>
+                        Access Expires:
+                    </strong>
+
+                    {{ access_request.access_expiry_date }}
+
+                </div>
+
+            {% endif %}
+
+
+
+            <!-- TIMELINE BUTTON -->
+
+            <button
+                class="btn btn-outline-primary btn-sm mt-2"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#timeline{{ access_request.id }}"
+            >
+
+                View Request Timeline
+
+            </button>
+
+
+
+            <!-- ================================================= -->
+            <!-- TIMELINE -->
+            <!-- ================================================= -->
+
+            <div
+                class="collapse"
+                id="timeline{{ access_request.id }}"
+            >
+
+                <div class="timeline-box">
+
+                    <h5>
+                        Request Timeline
+                    </h5>
+
+
+                    <div class="timeline">
+
+
+                        <!-- ================================= -->
+                        <!-- REQUEST SUBMITTED -->
+                        <!-- ================================= -->
+
+                        <div class="timeline-item">
+
+                            <div class="timeline-dot"></div>
+
+                            <div class="timeline-title">
+
+                                Request Submitted
+
+                            </div>
+
+                            <div class="timeline-time">
+
+                                {{ access_request.requested_at }}
+
+                            </div>
+
+                            <div class="timeline-by">
+
+                                Access request submitted by
+
+                                <strong>
+                                    {{ access_request.user.username }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ================================= -->
+                        <!-- MANAGER PENDING -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'Pending' %}
+
+                            <div class="timeline-item timeline-pending">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-warning">
+
+                                    Manager Review
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    Pending
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    Waiting for manager approval.
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- MANAGER APPROVED -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'Manager Approved' or access_request.status == 'IT Approved' or access_request.status == 'IT Rejected' or access_request.status == 'Active' or access_request.status == 'Expired' %}
+
+                            <div class="timeline-item timeline-approved">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-success">
+
+                                    Manager Approved
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    {% if access_request.manager_action_at %}
+
+                                        {{ access_request.manager_action_at }}
+
+                                    {% else %}
+
+                                        Approval completed
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    {% if access_request.manager_action_by %}
+
+                                        Approved by
+
+                                        <strong>
+                                            {{ access_request.manager_action_by.username }}
+                                        </strong>
+
+                                    {% else %}
+
+                                        Manager approved the request.
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- MANAGER REJECTED -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'Manager Rejected' %}
+
+                            <div class="timeline-item timeline-rejected">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-danger">
+
+                                    Manager Rejected
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    {% if access_request.manager_action_at %}
+
+                                        {{ access_request.manager_action_at }}
+
+                                    {% else %}
+
+                                        Rejection completed
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    {% if access_request.manager_action_by %}
+
+                                        Rejected by
+
+                                        <strong>
+                                            {{ access_request.manager_action_by.username }}
+                                        </strong>
+
+                                    {% else %}
+
+                                        Manager rejected the request.
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- IT ADMIN PENDING -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'Manager Approved' %}
+
+                            <div class="timeline-item timeline-pending">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-warning">
+
+                                    IT Admin Review
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    Pending
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    Waiting for IT Admin approval.
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- IT APPROVED -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'IT Approved' or access_request.status == 'Active' or access_request.status == 'Expired' %}
+
+                            <div class="timeline-item timeline-approved">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-success">
+
+                                    IT Admin Approved
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    {% if access_request.it_action_at %}
+
+                                        {{ access_request.it_action_at }}
+
+                                    {% else %}
+
+                                        Approval completed
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    {% if access_request.it_action_by %}
+
+                                        Approved by
+
+                                        <strong>
+                                            {{ access_request.it_action_by.username }}
+                                        </strong>
+
+                                    {% else %}
+
+                                        IT Admin approved the request.
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- IT REJECTED -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'IT Rejected' %}
+
+                            <div class="timeline-item timeline-rejected">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-danger">
+
+                                    IT Admin Rejected
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    {% if access_request.it_action_at %}
+
+                                        {{ access_request.it_action_at }}
+
+                                    {% else %}
+
+                                        Rejection completed
+
+                                    {% endif %}
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    {% if access_request.it_action_by %}
+
+                                        Rejected by
+
+                                        <strong>
+                                            {{ access_request.it_action_by.username }}
+                                        </strong>
+
+                                    {% else %}
+
+                                        IT Admin rejected the request.
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- ACCESS ACTIVE -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'Active' %}
+
+                            <div class="timeline-item timeline-active">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-primary">
+
+                                    Access Active
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    {{ access_request.access_start_date }}
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    Access granted for
+
+                                    <strong>
+                                        {{ access_request.duration_days }}
+                                    </strong>
+
+                                    days.
+
+                                    <br><br>
+
+                                    <strong>
+                                        Access Expires:
+                                    </strong>
+
+                                    {{ access_request.access_expiry_date }}
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+
+                        <!-- ================================= -->
+                        <!-- ACCESS EXPIRED -->
+                        <!-- ================================= -->
+
+                        {% if access_request.status == 'Expired' %}
+
+                            <div class="timeline-item">
+
+                                <div class="timeline-dot"></div>
+
+                                <div class="timeline-title text-secondary">
+
+                                    Access Expired
+
+                                </div>
+
+                                <div class="timeline-time">
+
+                                    {{ access_request.access_expiry_date }}
+
+                                </div>
+
+                                <div class="timeline-by">
+
+                                    The access period has ended.
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    {% else %}
+
+        <div class="alert alert-info">
+
+            You have not submitted any access requests yet.
+
+        </div>
+
+    {% endif %}
+
+
+
+    <a
+        href="{% url 'resource_list' %}"
+        class="btn btn-primary mb-5"
+    >
+
+        Browse Resources
+
+    </a>
+
+
+</div>
+
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+></script>
+
+
+</body>
+
+</html>
